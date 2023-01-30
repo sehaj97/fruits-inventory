@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Fresh Fruits Inventory</title>
+    <style>
+      body {
+        background-color: #2b2b2b;
+        color: antiquewhite;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        font-weight: 600;
+        text-transform: capitalize;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #f5f5f5;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        background-color: #2b2b2b;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f5f5f5;
+        color: #2b2b2b;
+      }
+
+      tr:nth-child(even) {
+        background-color: #393939;
+      }
+
+      tr:nth-child(odd) {
+        background-color: #2b2b2b;
+      }
+      input,
+      label {
+        font-size: 16px;
+        font-family: Arial, sans-serif;
+        color: #fff;
+      }
+
+      input[type="text"],
+      input[type="Number"] {
+        background-color: #393939;
+        border: 1px solid #fff;
+        padding: 12px;
+        width: 70%;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      input[type="submit"],
+      button {
+        background-color: #1e90ff;
+        color: #fff;
+        padding: 12px 20px;
+        border: none;
+        cursor: pointer;
+        border-radius: 20px;
+      }
+
+      input[type="submit"]:hover,
+      button:hover {
+        background-color: #000080;
+      }
+
+      .cheaper {
+        background-color: teal !important;
+      }
+
+      .filter-input {
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let originalData = [
+        {
+          fruit_name: "Banana",
+          price: 0.75,
+          last_updated: "2022-Jan-01",
+          inventory_count: 7,
+          supplier: "Vasani Fresh",
+        },
+        {
+          fruit_name: "Banana",
+          price: 0.79,
+          last_updated: "2022-Mar-01",
+          inventory_count: 66,
+          supplier: "Zeni Fruits",
+        },
+        {
+          fruit_name: "Apple",
+          price: 3.0,
+          last_updated: "2022-Jan-01",
+          inventory_count: 66,
+          supplier: "Vasani Fresh",
+        },
+        {
+          fruit_name: "Apple",
+          price: 1.77,
+          last_updated: "2022-June-02",
+          inventory_count: 13,
+          supplier: "Zeni Fruits",
+        },
+        {
+          fruit_name: "Dragon Fruit",
+          price: 9.0,
+          last_updated: "1999-Feb-26",
+          inventory_count: 4,
+          supplier: "Vasani Fresh",
+        },
+        {
+          fruit_name: "Dragon Fruit",
+          price: 8.0,
+          last_updated: "2001-Nov-02",
+          inventory_count: 5,
+          supplier: "Zeni Fruits",
+        },
+        {
+          fruit_name: "Kiwi",
+          price: 0.25,
+          last_updated: "1996-Jan-25",
+          inventory_count: 301,
+          supplier: "Vasani Fresh",
+        },
+        {
+          fruit_name: "Kiwi",
+          price: 4.0,
+          last_updated: "2021-Oct-11",
+          inventory_count: 19,
+          supplier: "Zeni Fruits",
+        },
+        {
+          fruit_name: "Orange",
+          price: 0.99,
+          last_updated: "2020-Jun-06",
+          inventory_count: 67,
+          supplier: "Vasani Fresh",
+        },
+        {
+          fruit_name: "Orange",
+          price: 1.25,
+          last_updated: "2019-Apr-09",
+          inventory_count: 45,
+          supplier: "Zeni Fruits",
+        },
+        {
+          fruit_name: "Mango",
+          price: 3.29,
+          last_updated: "2014-Sep-20",
+          inventory_count: 30,
+          supplier: "Vasani Fresh",
+        },
+        {
+          fruit_name: "Peaches",
+          price: 2.79,
+          last_updated: "2015-Oct-14",
+          inventory_count: 45,
+          supplier: "Zeni Fruits",
+        },
+      ];
+
+      let data = originalData;
+
+      let sortAscending = true;
+
+      const createTable = (data, id) => {
+        const table = document.createElement("table");
+
+        const headerRow = document.createElement("tr");
+        const headers = [
+          "Fruit Name",
+          "Price",
+          "Last Updated",
+          "Inventory Count",
+        ];
+        headers.forEach((header) => {
+          const th = document.createElement("th");
+          th.innerText = header;
+          const sortBtn = document.createElement("button");
+          sortBtn.innerHTML = "&#8597;";
+          sortBtn.addEventListener("click", () => {
+            sortAscending = !sortAscending;
+            sortTable(header, sortAscending);
+          });
+
+          th.appendChild(sortBtn);
+          headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        data.forEach((fruit) => {
+          const row = document.createElement("tr");
+          const fruitName = document.createElement("td");
+          fruitName.innerText = fruit.fruit_name;
+          const price = document.createElement("td");
+          price.innerText = fruit.price;
+          const lastUpdated = document.createElement("td");
+          lastUpdated.innerText = fruit.last_updated;
+          const inventoryCount = document.createElement("td");
+          inventoryCount.innerText = fruit.inventory_count;
+
+          row.setAttribute("data-fruit-name", fruit.fruit_name);
+          row.appendChild(fruitName);
+          row.appendChild(price);
+          row.appendChild(lastUpdated);
+          row.appendChild(inventoryCount);
+          table.appendChild(row);
+        });
+
+        document.getElementById(id).appendChild(table);
+      };
+
+      const highlightCheaper = (data1, id1, data2, id2) => {
+        data1.forEach((fruit1) => {
+          const table1 = document.getElementById(id1);
+          const row1 = table1.querySelector(
+            `[data-fruit-name='${fruit1.fruit_name}']`
+          );
+          const expensiveFruits = data2.find(
+            (f) => f.fruit_name === fruit1.fruit_name
+          );
+          if (expensiveFruits) {
+            const table2 = document.getElementById(id2);
+            const row2 = table2.querySelector(
+              `[data-fruit-name='${expensiveFruits.fruit_name}']`
+            );
+            if (fruit1.price < expensiveFruits.price) {
+              row1.classList.add("cheaper");
+            } else {
+              row2.classList.add("cheaper");
+            }
+          } else {
+            row1.classList.add("cheaper");
+          }
+        });
+
+        let uniqueData = [];
+        for (let i = 0; i < data1.length; i++) {
+          let found = false;
+          for (let j = 0; j < data2.length; j++) {
+            if (data1[i].fruit_name === data2[j].fruit_name) {
+              found = true;
+            }
+          }
+          if (!found) {
+            uniqueData.push(data1[i]);
+          }
+        }
+
+        for (let i = 0; i < data2.length; i++) {
+          let found = false;
+          for (let j = 0; j < data1.length; j++) {
+            if (data2[i].fruit_name === data1[j].fruit_name) {
+              found = true;
+            }
+          }
+          if (!found) {
+            uniqueData.push(data2[i]);
+          }
+        }
+        uniqueData.forEach((item) =>
+          document
+            .querySelector(`[data-fruit-name='${item.fruit_name}']`)
+            .classList.add("cheaper")
+        );
+      };
+
+      const sortData = (data, sortValue) => {
+        return data.filter((fruit) => fruit.supplier === sortValue);
+      };
+
+      const sortTable = (column, sortAscending) => {
+        // determine the column to sort by
+        switch (column) {
+          case "Fruit Name":
+            data.sort((a, b) =>
+              sortAscending
+                ? a.fruit_name > b.fruit_name
+                  ? 1
+                  : -1
+                : b.fruit_name > a.fruit_name
+                ? 1
+                : -1
+            );
+            break;
+          case "Price":
+            data.sort((a, b) =>
+              sortAscending
+                ? a.price > b.price
+                  ? 1
+                  : -1
+                : b.price > a.price
+                ? 1
+                : -1
+            );
+            break;
+          case "Last Updated":
+            data.sort((a, b) =>
+              sortAscending
+                ? a.last_updated > b.last_updated
+                  ? 1
+                  : -1
+                : b.last_updated > a.last_updated
+                ? 1
+                : -1
+            );
+            break;
+          case "Inventory Count":
+            data.sort((a, b) =>
+              sortAscending
+                ? a.inventory_count > b.inventory_count
+                  ? 1
+                  : -1
+                : b.inventory_count > a.inventory_count
+                ? 1
+                : -1
+            );
+            break;
+        }
+
+        // re-render the table
+        const table = document.querySelector("table");
+        table.innerHTML = "";
+        document.getElementById("vasani-fresh").innerHTML = "";
+        document.getElementById("zeni-fruits").innerHTML = "";
+
+        renderTables(data);
+      };
+
+      const removeFruits = () => {
+        // TO DO : Use lodash to compare datas
+        const filterValue = document
+          .getElementById("filter")
+          .value.toLowerCase();
+        const filteredData = data.filter(
+          (fruit) => fruit.fruit_name.toLowerCase() !== filterValue
+        );
+        if (filteredData.length == data.length) {
+          alert(`${filterValue} does not exist in inventory`);
+        } else {
+          document.getElementById("vasani-fresh").innerHTML = "";
+          document.getElementById("zeni-fruits").innerHTML = "";
+
+          renderTables(filteredData);
+
+          alert(`${filterValue} is removed`);
+        }
+      };
+
+      const showFilteredFruits = () => {
+        // TO DO : Use lodash to compare datas
+        const filterValue = document
+          .getElementById("filter")
+          .value.toLowerCase();
+        if (filterValue == "") {
+          alert("please add some item name");
+        } else {
+          const filteredData = data.filter(
+            (fruit) => fruit.fruit_name.toLowerCase() === filterValue
+          );
+          document.getElementById("vasani-fresh").innerHTML = "";
+          document.getElementById("zeni-fruits").innerHTML = "";
+
+          renderTables(filteredData);
+        }
+      };
+
+      const createOrderEstimate = (event) => {
+        event.preventDefault();
+        const fruitName = document
+          .getElementById("fruit-name")
+          .value.toLowerCase();
+        const quantity = document
+          .getElementById("quantity")
+          .value.toLowerCase();
+        let cheaperSupplier = "";
+        let cheaperPrice = Number.MAX_SAFE_INTEGER;
+        let moreExpensiveSupplier = "";
+        let moreExpensivePrice = 0;
+
+        data.forEach((item) => {
+          if (item.fruit_name.toLowerCase() === fruitName) {
+            if (item.price < cheaperPrice) {
+              cheaperPrice = item.price;
+              cheaperSupplier = item.supplier;
+            } else if (item.price > moreExpensivePrice) {
+              moreExpensivePrice = item.price;
+              moreExpensiveSupplier = item.supplier;
+            }
+          }
+        });
+
+        let cheaperSupplierInventory = 0;
+        let moreExpensiveSupplierInventory = 0;
+
+        data.forEach((item) => {
+          if (item.fruit_name.toLowerCase() === fruitName) {
+            if (item.supplier === cheaperSupplier) {
+              cheaperSupplierInventory = item.inventory_count;
+            } else if (item.supplier === moreExpensiveSupplier) {
+              moreExpensiveSupplierInventory = item.inventory_count;
+            }
+          }
+        });
+
+        let remainingQuantity = quantity;
+        let totalCost = 0;
+
+        if (cheaperSupplierInventory >= remainingQuantity) {
+          totalCost = cheaperPrice * remainingQuantity;
+        } else {
+          totalCost = cheaperPrice * cheaperSupplierInventory;
+          remainingQuantity -= cheaperSupplierInventory;
+          totalCost += moreExpensivePrice * remainingQuantity;
+        }
+
+        alert(
+          `Total cost of ${quantity} ${fruitName}(s) is $${totalCost.toFixed(
+            2
+          )}`
+        );
+      };
+
+      const showFilterButtons = () => {
+        document.getElementById("add-btn").disabled = false;
+        document.getElementById("remove-btn").disabled = false;
+        document.getElementById("view-all-btn").disabled = false;
+      };
+
+      const resetTableView = () => {
+        data = originalData;
+        document.getElementById("vasani-fresh").innerHTML = "";
+        document.getElementById("zeni-fruits").innerHTML = "";
+        renderTables(data);
+      };
+
+      const renderBody = () => {
+        const h1Title = document.createElement("h1");
+        h1Title.textContent = "Fruits Inventory";
+
+        const h1Vasani = document.createElement("h1");
+        h1Vasani.textContent = "Vasani Fresh";
+        const divVasani = document.createElement("div");
+        divVasani.id = "vasani-fresh";
+
+        const h1Zeni = document.createElement("h1");
+        h1Zeni.textContent = "Zeni Fruits";
+        const divZeni = document.createElement("div");
+        divZeni.id = "zeni-fruits";
+
+        const inputs = document.createElement("div");
+
+        const filterInput = document.createElement("div");
+        filterInput.className = "filter-input";
+
+        const labelFilter = document.createElement("label");
+        labelFilter.setAttribute("for", "filter");
+        labelFilter.textContent = "Item:";
+        const inputFilter = document.createElement("input");
+        inputFilter.type = "text";
+        inputFilter.id = "filter";
+
+        inputFilter.addEventListener("click", showFilterButtons);
+
+        filterInput.appendChild(labelFilter);
+        filterInput.appendChild(inputFilter);
+
+        const removeInput = document.createElement("div");
+        removeInput.className = "filter-input";
+        const removeBtn = document.createElement("input");
+        removeBtn.disabled = true;
+        removeBtn.type = "submit";
+        removeBtn.value = "Remove Item";
+        removeBtn.addEventListener("click", removeFruits);
+        removeInput.appendChild(removeBtn);
+        removeBtn.id = "remove-btn";
+
+        const addInput = document.createElement("div");
+        addInput.className = "filter-input";
+        const addBtn = document.createElement("input");
+        addBtn.disabled = true;
+        addBtn.type = "submit";
+        addBtn.value = "Show Item";
+        addBtn.addEventListener("click", showFilteredFruits);
+        addInput.appendChild(addBtn);
+        addBtn.id = "add-btn";
+
+        const viewAllInput = document.createElement("div");
+        viewAllInput.className = "filter-input";
+        const viewAllBtn = document.createElement("input");
+        viewAllBtn.disabled = true;
+        viewAllBtn.type = "submit";
+        viewAllBtn.value = "View All Items";
+        viewAllBtn.addEventListener("click", resetTableView);
+        viewAllInput.appendChild(viewAllBtn);
+        viewAllBtn.id = "view-all-btn";
+
+        const fruitNameDiv = document.createElement("div");
+        fruitNameDiv.className = "estimate-input";
+        const labelFruitName = document.createElement("label");
+        labelFruitName.setAttribute("for", "fruit-name");
+        labelFruitName.textContent = "Fruit Name:";
+        const inputFruitName = document.createElement("input");
+        inputFruitName.type = "text";
+        inputFruitName.id = "fruit-name";
+
+        const quantityDiv = document.createElement("div");
+        quantityDiv.className = "estimate-input";
+        const labelQuantity = document.createElement("label");
+        labelQuantity.setAttribute("for", "quantity");
+        labelQuantity.textContent = "Quantity:";
+        const inputQuantity = document.createElement("input");
+        inputQuantity.type = "number";
+        inputQuantity.id = "quantity";
+
+        const estimateDiv = document.createElement("div");
+        estimateDiv.className = "estimate-input";
+        const submitEstimateBtn = document.createElement("input");
+        submitEstimateBtn.addEventListener("click", createOrderEstimate);
+        submitEstimateBtn.type = "submit";
+        submitEstimateBtn.value = "Calculate Estimate";
+
+        fruitNameDiv.appendChild(labelFruitName);
+        fruitNameDiv.appendChild(inputFruitName);
+        quantityDiv.appendChild(labelQuantity);
+        quantityDiv.appendChild(inputQuantity);
+        estimateDiv.appendChild(submitEstimateBtn);
+
+        inputs.appendChild(fruitNameDiv);
+        inputs.appendChild(quantityDiv);
+        inputs.appendChild(estimateDiv);
+        inputs.appendChild(filterInput);
+        inputs.appendChild(removeInput);
+        inputs.appendChild(addInput);
+        inputs.appendChild(viewAllInput);
+
+        document.body.appendChild(h1Title);
+
+        document.body.appendChild(inputs);
+        document.body.appendChild(h1Vasani);
+        document.body.appendChild(divVasani);
+        document.body.appendChild(h1Zeni);
+        document.body.appendChild(divZeni);
+      };
+
+      const renderTables = (data) => {
+        createTable(sortData(data, "Vasani Fresh"), "vasani-fresh");
+        createTable(sortData(data, "Zeni Fruits"), "zeni-fruits");
+
+        highlightCheaper(
+          sortData(data, "Vasani Fresh"),
+          "vasani-fresh",
+          sortData(data, "Zeni Fruits"),
+          "zeni-fruits"
+        );
+      };
+
+      renderBody();
+      renderTables(data);
+    </script>
+  </body>
+</html>
