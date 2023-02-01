@@ -411,7 +411,7 @@
 
         let cheaperSupplierInventory = 0;
         let moreExpensiveSupplierInventory = 0;
-
+        let totalInventory = 0;
         data.forEach((item) => {
           if (item.fruit_name.toLowerCase() === fruitName) {
             if (item.supplier === cheaperSupplier) {
@@ -419,25 +419,46 @@
             } else if (item.supplier === moreExpensiveSupplier) {
               moreExpensiveSupplierInventory = item.inventory_count;
             }
+            totalInventory += item.inventory_count;
           }
         });
 
         let remainingQuantity = quantity;
         let totalCost = 0;
+        if (totalInventory >= remainingQuantity) {
+          if (cheaperSupplierInventory >= remainingQuantity) {
+            totalCost = cheaperPrice * remainingQuantity;
+          } else {
+            totalCost = cheaperPrice * cheaperSupplierInventory;
+            remainingQuantity -= cheaperSupplierInventory;
+            totalCost += moreExpensivePrice * remainingQuantity;
+          }
 
-        if (cheaperSupplierInventory >= remainingQuantity) {
-          totalCost = cheaperPrice * remainingQuantity;
+          alert(
+            `Total cost of ${quantity} ${fruitName}(s) is $${totalCost.toFixed(
+              2
+            )}`
+          );
         } else {
-          totalCost = cheaperPrice * cheaperSupplierInventory;
-          remainingQuantity -= cheaperSupplierInventory;
-          totalCost += moreExpensivePrice * remainingQuantity;
+          let outOfStock = remainingQuantity - totalInventory;
+          remainingQuantity = totalInventory;
+          if (cheaperSupplierInventory >= remainingQuantity) {
+            totalCost = cheaperPrice * remainingQuantity;
+          } else {
+            totalCost = cheaperPrice * cheaperSupplierInventory;
+            remainingQuantity -= cheaperSupplierInventory;
+            totalCost += moreExpensivePrice * remainingQuantity;
+          }
+
+          alert(
+            `Total cost of ${totalInventory} ${fruitName}(s) is $${totalCost.toFixed(
+              2
+            )} but rest of the quantity ${outOfStock} needs to purchased from elsewhere`
+          );
         }
 
-        alert(
-          `Total cost of ${quantity} ${fruitName}(s) is $${totalCost.toFixed(
-            2
-          )}`
-        );
+        // calculate the total cost of quantity avaliable if the quantiy exceed
+        // a message for remaining quantity
       };
 
       const showFilterButtons = () => {
